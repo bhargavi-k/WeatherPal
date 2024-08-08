@@ -13,7 +13,9 @@ import {
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Searchbar} from 'react-native-paper';
 import {requestLocationPermissions} from './src/utils/locationPermissions';
-import {PermissionStatus} from 'react-native-permissions';
+import {PermissionStatus, RESULTS} from 'react-native-permissions';
+import Geolocation from 'react-native-geolocation-service';
+import {Coordinates} from './src/types/weatherServiceResponses';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -49,12 +51,30 @@ function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const [locationPermissionStatus, setLocationPermissionStatus] =
     useState<PermissionStatus>();
+  const [currentCoordinates, setCurrentCoordinates] = useState<Coordinates>();
 
   useEffect(() => {
     requestLocationPermissions().then(status =>
       setLocationPermissionStatus(status),
     );
   }, []);
+
+  useEffect(() => {
+    if (locationPermissionStatus === RESULTS.GRANTED) {
+      Geolocation.getCurrentPosition(
+        position => {
+          console.log(position);
+          setCurrentCoordinates({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          });
+        },
+        error => {
+          console.log(error);
+        },
+      );
+    }
+  }, [locationPermissionStatus]);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,

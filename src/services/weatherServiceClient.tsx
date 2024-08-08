@@ -12,25 +12,7 @@ export const getWeatherByCity = async (
     units: 'imperial',
     appid: apiKey,
   });
-  try {
-    const response = await fetch(`${weatherUrl}?${queryParams.toString()}`);
-
-    const data: WeatherDataResponse = await response.json();
-    if (response.status === 200) {
-      return {
-        locationName: data.name,
-        currentTemp: Math.round(data.main.temp),
-        feels_like: Math.round(data.main.feels_like),
-        temp_min: Math.round(data.main.temp_min),
-        temp_max: Math.round(data.main.temp_max),
-        conditions: data.weather[0].main,
-      };
-    }
-    return undefined;
-  } catch (e) {
-    console.error(`Error getting weather for ${city}`, e);
-    return undefined;
-  }
+  return getWeather(queryParams);
 };
 
 export const getWeatherByZip = async (
@@ -41,8 +23,14 @@ export const getWeatherByZip = async (
     units: 'imperial',
     appid: apiKey,
   });
+  return getWeather(queryParams);
+};
+
+const getWeather = async (
+  searchParams: URLSearchParams,
+): Promise<WeatherDisplayData | undefined> => {
   try {
-    const response = await fetch(`${weatherUrl}?${queryParams.toString()}`);
+    const response = await fetch(`${weatherUrl}?${searchParams.toString()}`);
 
     const data: WeatherDataResponse = await response.json();
     if (response.status === 200) {
@@ -57,7 +45,7 @@ export const getWeatherByZip = async (
     }
     return undefined;
   } catch (e) {
-    console.error(`Error getting weather for ${zip}`, e);
+    console.error(`Error getting weather`, e);
     return undefined;
   }
 };

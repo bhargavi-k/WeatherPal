@@ -59,7 +59,7 @@ function App(): React.JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Searchbar />
+        <Searchbar placeholder="Search by city name, zip code, or coordinates" />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,

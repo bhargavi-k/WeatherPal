@@ -4,28 +4,6 @@ import {WeatherDisplayData} from '../types/weatherDisplayData';
 export const weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
 const apiKey = 'apiKey';
 
-export const getWeatherByCity = async (
-  city: string,
-): Promise<WeatherDisplayData | undefined> => {
-  let queryParams = new URLSearchParams({
-    q: city,
-    units: 'imperial',
-    appid: apiKey,
-  });
-  return getWeather(queryParams);
-};
-
-export const getWeatherByZip = async (
-  zip: string,
-): Promise<WeatherDisplayData | undefined> => {
-  let queryParams = new URLSearchParams({
-    zip: zip,
-    units: 'imperial',
-    appid: apiKey,
-  });
-  return getWeather(queryParams);
-};
-
 const getWeather = async (
   searchParams: URLSearchParams,
 ): Promise<WeatherDisplayData | undefined> => {
@@ -48,4 +26,39 @@ const getWeather = async (
     console.error(`Error getting weather`, e);
     return undefined;
   }
+};
+
+export const getWeatherByCity = async (
+  city: string,
+): Promise<WeatherDisplayData | undefined> => {
+  let queryParams = new URLSearchParams({
+    q: city,
+    units: 'imperial',
+    appid: apiKey,
+  });
+  return getWeather(queryParams);
+};
+
+export const getWeatherByZip = async (
+  zip: string,
+): Promise<WeatherDisplayData | undefined> => {
+  let queryParams = new URLSearchParams({
+    zip: zip,
+    units: 'imperial',
+    appid: apiKey,
+  });
+  return getWeather(queryParams);
+};
+
+export const getWeatherByCoordinates = async (
+  lat: number,
+  lon: number,
+): Promise<WeatherDisplayData | undefined> => {
+  let queryParams = new URLSearchParams({
+    lat: `${lat}`,
+    lon: `${lon}`,
+    units: 'imperial',
+    appid: apiKey,
+  });
+  return getWeather(queryParams);
 };

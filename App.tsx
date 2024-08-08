@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -12,6 +12,8 @@ import {
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Searchbar} from 'react-native-paper';
+import {requestLocationPermissions} from './src/utils/locationPermissions';
+import {PermissionStatus} from 'react-native-permissions';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -45,6 +47,14 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [locationPermissionStatus, setLocationPermissionStatus] =
+    useState<PermissionStatus>();
+
+  useEffect(() => {
+    requestLocationPermissions().then(status =>
+      setLocationPermissionStatus(status),
+    );
+  }, []);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,

@@ -1,6 +1,5 @@
 import {requestLocationPermissions} from '../../../src/utils/locationPermissions';
 import {PERMISSIONS, request} from 'react-native-permissions';
-import {Platform} from 'react-native';
 
 describe('location permissions', () => {
   afterEach(() => {

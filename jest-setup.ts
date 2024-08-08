@@ -2,3 +2,6 @@
 
 // Import built-in Jest matchers
 import '@testing-library/react-native/extend-expect';
+jest.mock('react-native-permissions', () =>
+  require('react-native-permissions/mock'),
+);

@@ -16,6 +16,13 @@ describe('location permissions', () => {
       );
     });
 
+    it('return permission status for iOS', async () => {
+      request.mockResolvedValue('granted');
+
+      const permissionStatus = await requestLocationPermissions();
+      expect(permissionStatus).toEqual('granted');
+    });
+
     it('requests ACCESS_FINE_LOCATION for Android', () => {
       jest.mock('react-native/Libraries/Utilities/Platform', () => ({
         OS: 'android',
@@ -25,6 +32,16 @@ describe('location permissions', () => {
       expect(request).toHaveBeenCalledWith(
         PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
       );
+    });
+
+    it('return permission status for Android', async () => {
+      jest.mock('react-native/Libraries/Utilities/Platform', () => ({
+        OS: 'android',
+      }));
+      request.mockResolvedValue('denied');
+
+      const permissionStatus = await requestLocationPermissions();
+      expect(permissionStatus).toEqual('denied');
     });
   });
 });

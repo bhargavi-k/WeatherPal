@@ -32,3 +32,32 @@ export const getWeatherByCity = async (
     return undefined;
   }
 };
+
+export const getWeatherByZip = async (
+  zip: string,
+): Promise<WeatherDisplayData | undefined> => {
+  let queryParams = new URLSearchParams({
+    zip: zip,
+    units: 'imperial',
+    appid: apiKey,
+  });
+  try {
+    const response = await fetch(`${weatherUrl}?${queryParams.toString()}`);
+
+    const data: WeatherDataResponse = await response.json();
+    if (response.status === 200) {
+      return {
+        locationName: data.name,
+        currentTemp: Math.round(data.main.temp),
+        feels_like: Math.round(data.main.feels_like),
+        temp_min: Math.round(data.main.temp_min),
+        temp_max: Math.round(data.main.temp_max),
+        conditions: data.weather[0].main,
+      };
+    }
+    return undefined;
+  } catch (e) {
+    console.error(`Error getting weather for ${zip}`, e);
+    return undefined;
+  }
+};

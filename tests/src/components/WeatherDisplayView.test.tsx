@@ -11,6 +11,12 @@ describe('WeatherDisplayView', () => {
     conditions: 'Cloudy',
   };
 
+  it('shows NoResults view if weather data is undefined', async () => {
+    render(<WeatherDisplayView weatherDisplayData={undefined} />);
+    const noResultsView = await screen.findByTestId('noResults');
+    expect(noResultsView).toBeOnTheScreen();
+  });
+
   it('shows view if weather data is passed in', async () => {
     render(<WeatherDisplayView weatherDisplayData={weatherData} />);
     const weatherDataView = await screen.findByTestId('weatherDataView');

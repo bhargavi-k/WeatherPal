@@ -2,6 +2,7 @@ import {ScrollView, StyleSheet, Text, useColorScheme, View} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import React, {PropsWithChildren} from 'react';
 import {WeatherDisplayData} from '../types/weatherDisplayData';
+import {NoResults} from './NoResults';
 
 const styles = StyleSheet.create({
   sectionContainer: {
@@ -66,10 +67,17 @@ export const WeatherDisplayView = ({
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
       style={backgroundStyle}>
       {weatherDisplayData ? (
         <View
           style={{
+            flex: 1,
+            flexDirection: 'column',
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}
           testID={'weatherDataView'}>
@@ -98,7 +106,9 @@ export const WeatherDisplayView = ({
               'minTempSection'
             }>{`${weatherDisplayData.temp_min}\u00B0`}</Section>
         </View>
-      ) : null}
+      ) : (
+        <NoResults />
+      )}
     </ScrollView>
   );
 };

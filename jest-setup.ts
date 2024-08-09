@@ -6,3 +6,6 @@ jest.mock('react-native-permissions', () =>
   require('react-native-permissions/mock'),
 );
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
+jest.mock('./secrets.json', () => ({
+  weatherAPIKey: 'apiKey',
+}));

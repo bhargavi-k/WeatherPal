@@ -64,7 +64,9 @@ function App(): React.JSX.Element {
       />
       <WeatherDisplayView
         weatherDisplayData={
-          searchText ? searchWeatherData : weatherForCurrentLocation
+          searchText && searchWeatherData
+            ? searchWeatherData
+            : weatherForCurrentLocation
         }
       />
     </SafeAreaView>

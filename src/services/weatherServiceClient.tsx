@@ -1,8 +1,8 @@
 import {WeatherDataResponse} from '../types/weatherServiceResponses';
 import {WeatherDisplayData} from '../types/weatherDisplayData';
+import {weatherAPIKey as apiKey} from '../../secrets.json';
 
 export const weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
-const apiKey = 'apiKey';
 
 const getWeather = async (
   searchParams: URLSearchParams,

@@ -54,7 +54,8 @@ function App(): React.JSX.Element {
   const [locationPermissionStatus, setLocationPermissionStatus] =
     useState<PermissionStatus>();
   const [currentCoordinates, setCurrentCoordinates] = useState<Coordinates>();
-  const [weatherData, setWeatherData] = useState<WeatherDisplayData>();
+  const [weatherForCurrentLocation, setWeatherForCurrentLocation] =
+    useState<WeatherDisplayData>();
 
   useEffect(() => {
     requestLocationPermissions().then(status => {
@@ -63,7 +64,7 @@ function App(): React.JSX.Element {
         getCurrentCoordinates().then(coords => {
           setCurrentCoordinates(coords);
           getWeatherByCoordinates(coords.lat, coords.lon).then(data =>
-            setWeatherData(data),
+            setWeatherForCurrentLocation(data),
           );
         });
       }

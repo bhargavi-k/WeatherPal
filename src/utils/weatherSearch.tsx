@@ -1,3 +1,10 @@
+import {WeatherDisplayData} from '../types/weatherDisplayData';
+import {chain, isNumber, result} from 'lodash';
+import {
+  getWeatherByCity,
+  getWeatherByCoordinates,
+  getWeatherByZip,
+} from '../services/weatherServiceClient';
 import {Coordinates} from '../types/weatherServiceResponses';
 
 export const getLatLon = (searchText: string): Coordinates | undefined => {
@@ -14,6 +21,31 @@ export const getLatLon = (searchText: string): Coordinates | undefined => {
         lon: parseFloat(possibleCoordinates[1]),
       };
     }
+  }
+  return undefined;
+};
+
+export const searchWeather = async (
+  searchText: string,
+): Promise<WeatherDisplayData | undefined> => {
+  const coordinates = getLatLon(searchText);
+  if (coordinates) {
+    const weather = await getWeatherByCoordinates(
+      coordinates.lat,
+      coordinates.lon,
+    );
+    if (weather) {
+      return weather;
+    }
+  }
+
+  const results = await Promise.all([
+    getWeatherByCity(searchText),
+    getWeatherByZip(searchText),
+  ]);
+
+  if (results.length > 0) {
+    return results[0];
   }
   return undefined;
 };

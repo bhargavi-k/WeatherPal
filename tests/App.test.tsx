@@ -34,19 +34,22 @@ const mockWeatherSearch = weatherSearchModule as jest.Mocked<
 >;
 
 describe('App', () => {
-  const mockWeatherData = {
-    name: 'Little Elm',
-    main: {
-      temp: 100.1,
-      feels_like: 103.2,
-      temp_min: 78.23,
-      temp_max: 105.67,
-    },
-    weather: [
-      {
-        main: 'Cloudy',
-      },
-    ],
+  const currentDisplayData = {
+    locationName: 'Frisco',
+    currentTemp: 100,
+    feels_like: 103,
+    temp_min: 78,
+    temp_max: 106,
+    conditions: 'Cloudy',
+  };
+
+  const searchDisplayData = {
+    locationName: 'Little Elm',
+    currentTemp: 100,
+    feels_like: 103,
+    temp_min: 78,
+    temp_max: 106,
+    conditions: 'Cloudy',
   };
 
   beforeEach(() => {
@@ -58,10 +61,10 @@ describe('App', () => {
       .mockResolvedValue({lat: 33.1626, lon: -96.9375});
     mockWeatherServiceClient.getWeatherByCoordinates = jest
       .fn()
-      .mockResolvedValue(mockWeatherData);
+      .mockResolvedValue(currentDisplayData);
     mockWeatherSearch.searchWeather = jest
       .fn()
-      .mockResolvedValue(mockWeatherData);
+      .mockResolvedValue(searchDisplayData);
   });
   afterEach(() => {
     jest.resetAllMocks();
@@ -159,6 +162,30 @@ describe('App', () => {
         expect(
           mockWeatherServiceClient.getWeatherByCoordinates,
         ).toHaveBeenCalledWith(33.1626, -96.9375);
+      });
+    });
+  });
+
+  describe('WeatherDisplayView', () => {
+    it('displays weather for current location if no search', async () => {
+      render(<App />);
+      const view = await screen.findByTestId('weatherDataView');
+      expect(view).toHaveTextContent(currentDisplayData.locationName, {
+        exact: false,
+      });
+    });
+
+    it('displays weather for search location if search is initiated', async () => {
+      render(<App />);
+      const searchBarIcon = await screen.findByTestId('searchBar-icon');
+      const searchBar = await screen.findByTestId('searchBar');
+
+      fireEvent(searchBar, 'onChangeText', 'Little Elm');
+      fireEvent(searchBarIcon, 'onIconPress');
+
+      const view = await screen.findByTestId('weatherDataView');
+      expect(view).toHaveTextContent(searchDisplayData.locationName, {
+        exact: false,
       });
     });
   });

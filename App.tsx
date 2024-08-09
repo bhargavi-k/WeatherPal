@@ -1,13 +1,5 @@
-import type {PropsWithChildren} from 'react';
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Searchbar} from 'react-native-paper';
@@ -19,36 +11,6 @@ import {WeatherDisplayData} from './src/types/weatherDisplayData';
 import {getCurrentCoordinates} from './src/utils/geolocation';
 import {searchWeather} from './src/utils/weatherSearch';
 import {WeatherDisplayView} from './src/components/WeatherDisplayView';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -103,28 +65,13 @@ function App(): React.JSX.Element {
         onIconPress={onSearch}
         onClearIconPress={clearSearch}
       />
-      <WeatherDisplayView />
+      <WeatherDisplayView
+        weatherDisplayData={
+          searchWeatherData ? searchWeatherData : weatherForCurrentLocation
+        }
+      />
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;

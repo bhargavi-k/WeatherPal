@@ -1,8 +1,7 @@
 import type {PropsWithChildren} from 'react';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -18,6 +17,8 @@ import {Coordinates} from './src/types/weatherServiceResponses';
 import {getWeatherByCoordinates} from './src/services/weatherServiceClient';
 import {WeatherDisplayData} from './src/types/weatherDisplayData';
 import {getCurrentCoordinates} from './src/utils/geolocation';
+import {searchWeather} from './src/utils/weatherSearch';
+import {WeatherDisplayView} from './src/components/WeatherDisplayView';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -51,10 +52,12 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  const [locationPermissionStatus, setLocationPermissionStatus] =
-    useState<PermissionStatus>();
-  const [currentCoordinates, setCurrentCoordinates] = useState<Coordinates>();
+  const [, setLocationPermissionStatus] = useState<PermissionStatus>();
+  const [, setCurrentCoordinates] = useState<Coordinates>();
   const [weatherForCurrentLocation, setWeatherForCurrentLocation] =
+    useState<WeatherDisplayData>();
+  const [searchText, setSearchText] = useState<string>();
+  const [searchWeatherData, setSearchWeatherData] =
     useState<WeatherDisplayData>();
 
   useEffect(() => {
@@ -75,23 +78,32 @@ function App(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const onSearch = useCallback(() => {
+    if (searchText) {
+      searchWeather(searchText).then(weather => setSearchWeatherData(weather));
+    }
+  }, [searchText]);
+
+  const clearSearch = () => {
+    setSearchText(undefined);
+    setSearchWeatherData(undefined);
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Searchbar placeholder="Search by city name, zip code, or coordinates" />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Placeholder title">Placeholder description</Section>
-        </View>
-      </ScrollView>
+      <Searchbar
+        placeholder="Search by city name, zip code, or coordinates"
+        testID="searchBar"
+        value={searchText}
+        onChangeText={setSearchText}
+        onIconPress={onSearch}
+        onClearIconPress={clearSearch}
+      />
+      <WeatherDisplayView />
     </SafeAreaView>
   );
 }

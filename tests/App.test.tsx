@@ -1,9 +1,17 @@
 import React from 'react';
 import App from '../App';
-import {render, screen, waitFor} from '@testing-library/react-native';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
 import * as locationPermissions from '../src/utils/locationPermissions';
 import * as geolocationModule from '../src/utils/geolocation';
 import * as weatherServicesModule from '../src/services/weatherServiceClient';
+import * as weatherSearchModule from '../src/utils/weatherSearch';
+import {wait} from '@testing-library/react-native/build/user-event/utils';
 
 jest.mock('../src/services/weatherServiceClient');
 const mockWeatherServiceClient = weatherServicesModule as jest.Mocked<
@@ -18,6 +26,11 @@ const mockGeolocation = geolocationModule as jest.Mocked<
 jest.mock('../src/utils/locationPermissions');
 const mockLocationPermissions = locationPermissions as jest.Mocked<
   typeof locationPermissions
+>;
+
+jest.mock('../src/utils/weatherSearch');
+const mockWeatherSearch = weatherSearchModule as jest.Mocked<
+  typeof weatherSearchModule
 >;
 
 describe('App', () => {
@@ -46,6 +59,9 @@ describe('App', () => {
     mockWeatherServiceClient.getWeatherByCoordinates = jest
       .fn()
       .mockResolvedValue(mockWeatherData);
+    mockWeatherSearch.searchWeather = jest
+      .fn()
+      .mockResolvedValue(mockWeatherData);
   });
   afterEach(() => {
     jest.resetAllMocks();
@@ -53,18 +69,53 @@ describe('App', () => {
   describe('searchbar', () => {
     it('renders searchbar', async () => {
       render(<App />);
-      const searchBar = await screen.findByTestId('search-bar');
+      const searchBar = await screen.findByTestId('searchBar');
 
       expect(searchBar).toBeOnTheScreen();
     });
 
     it('searchbar has correct placeholder text', async () => {
       render(<App />);
-      const searchBar = await screen.findByTestId('search-bar');
+      const searchBar = await screen.findByTestId('searchBar');
 
       expect(searchBar.props.placeholder).toEqual(
         'Search by city name, zip code, or coordinates',
       );
+    });
+
+    it('clicking on the search icon searches for the weather', async () => {
+      render(<App />);
+      const searchBarIcon = await screen.findByTestId('searchBar-icon');
+      const searchBar = await screen.findByTestId('searchBar');
+
+      fireEvent(searchBar, 'onChangeText', 'Little Elm');
+      fireEvent(searchBarIcon, 'onIconPress');
+
+      await waitFor(() => {
+        expect(mockWeatherSearch.searchWeather).toHaveBeenCalledTimes(1);
+        expect(mockWeatherSearch.searchWeather).toHaveBeenCalledWith(
+          'Little Elm',
+        );
+      });
+    });
+
+    it('clicking on the clear icon clears the search', async () => {
+      render(<App />);
+      const searchBarClearIcon = await screen.findByTestId(
+        'searchBar-clear-icon',
+      );
+      const searchBar = await screen.findByTestId('searchBar');
+
+      fireEvent(searchBar, 'onChangeText', 'Little Elm');
+      await waitFor(() => {
+        expect(searchBar.props.value).toEqual('Little Elm');
+      });
+
+      fireEvent(searchBarClearIcon, 'press');
+
+      await waitFor(() => {
+        expect(searchBar.props.value).toBeUndefined();
+      });
     });
   });
 

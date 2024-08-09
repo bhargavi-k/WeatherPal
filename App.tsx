@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -14,8 +14,10 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Searchbar} from 'react-native-paper';
 import {requestLocationPermissions} from './src/utils/locationPermissions';
 import {PermissionStatus, RESULTS} from 'react-native-permissions';
-import Geolocation from 'react-native-geolocation-service';
 import {Coordinates} from './src/types/weatherServiceResponses';
+import {getWeatherByCoordinates} from './src/services/weatherServiceClient';
+import {WeatherDisplayData} from './src/types/weatherDisplayData';
+import {getCurrentCoordinates} from './src/utils/geolocation';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -52,29 +54,21 @@ function App(): React.JSX.Element {
   const [locationPermissionStatus, setLocationPermissionStatus] =
     useState<PermissionStatus>();
   const [currentCoordinates, setCurrentCoordinates] = useState<Coordinates>();
+  const [weatherData, setWeatherData] = useState<WeatherDisplayData>();
 
   useEffect(() => {
-    requestLocationPermissions().then(status =>
-      setLocationPermissionStatus(status),
-    );
+    requestLocationPermissions().then(status => {
+      setLocationPermissionStatus(status);
+      if (status === RESULTS.GRANTED) {
+        getCurrentCoordinates().then(coords => {
+          setCurrentCoordinates(coords);
+          getWeatherByCoordinates(coords.lat, coords.lon).then(data =>
+            setWeatherData(data),
+          );
+        });
+      }
+    });
   }, []);
-
-  useEffect(() => {
-    if (locationPermissionStatus === RESULTS.GRANTED) {
-      Geolocation.getCurrentPosition(
-        position => {
-          console.log(position);
-          setCurrentCoordinates({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          });
-        },
-        error => {
-          console.log(error);
-        },
-      );
-    }
-  }, [locationPermissionStatus]);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
